@@ -1,0 +1,22 @@
+# VNPay Configuration
+
+# API Endpoints
+vnpay.pay-url=https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+vnpay.api-url=https://sandbox.vnpayment.vn/merchant_webapi/api/transaction
+vnpay.return-url=http://localhost:8080/api/payment/vnpay-return
+
+# Merchant Configuration
+vnpay.tmn-code=YOUR_TMN_CODE
+vnpay.hash-secret=YOUR_HASH_SECRET
+
+# API Settings
+vnpay.version=2.1.0
+vnpay.command=pay
+
+# Currency and Locale
+vnpay.currency=VND
+vnpay.locale=vn
+
+# Transaction Settings
+vnpay.order-type=other
+vnpay.txn-ref-prefix=PAY 
