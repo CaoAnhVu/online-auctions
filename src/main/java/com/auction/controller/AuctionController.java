@@ -140,6 +140,13 @@ public class AuctionController {
         return ResponseEntity.ok(responses);
     }
 
+    @GetMapping("/featured")
+    public ResponseEntity<List<AuctionResponse>> getFeaturedAuctions() {
+        List<Auction> auctions = auctionService.getTopMostViewedActiveAuctions(6);
+        List<AuctionResponse> responses = auctions.stream().map(this::mapToAuctionResponse).toList();
+        return ResponseEntity.ok(responses);
+    }
+
     private Auction mapToAuction(AuctionRequest request) {
         Auction auction = new Auction();
         auction.setTitle(request.getTitle());

@@ -218,8 +218,19 @@ public class AuctionServiceImpl implements AuctionService {
         throw new UnsupportedOperationException("Method not implemented");
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<Auction> getTopMostViewedActiveAuctions(int limit) {
+        return auctionRepository.findTopMostViewedActiveAuctions(org.springframework.data.domain.PageRequest.of(0, limit));
+    }
+
     @Scheduled(fixedRate = 60000) // Chạy mỗi 60 giây
     public void scheduledProcessEndedAuctions() {
         processEndedAuctions();
+    }
+
+    @Scheduled(fixedRate = 60000) // Chạy mỗi 60 giây
+    public void scheduledStartPendingAuctions() {
+        startPendingAuctions();
     }
 }

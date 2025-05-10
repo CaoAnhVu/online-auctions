@@ -7,8 +7,8 @@ import { fetchAuctionById, updateAuction } from '../redux/slices/auctionSlice';
 import ImageUpload from '../components/ImageUpload';
 import { format } from 'date-fns';
 
-const categories = ['Electronics', 'Fashion', 'Home & Garden', 'Art', 'Collectibles', 'Other'];
-const conditions = ['New', 'Like New', 'Good', 'Fair', 'Poor'];
+const categories = ['ELECTRONICS', 'FASHION', 'HOME', 'SPORTS', 'VEHICLES', 'COLLECTIBLES', 'ART', 'BOOKS', 'TOYS', 'MUSIC', 'OTHER'];
+const conditions = ['NEW', 'LIKE_NEW', 'USED', 'REFURBISHED', 'FOR_PARTS'];
 const API_BASE_URL = 'http://localhost:8080';
 
 function parseDateTime(dt) {

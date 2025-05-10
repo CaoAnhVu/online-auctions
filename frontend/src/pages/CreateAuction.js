@@ -8,8 +8,8 @@ import { createAuction } from '../redux/slices/auctionSlice';
 import ImageUpload from '../components/ImageUpload';
 import api from '../services/api';
 
-const categories = ['ELECTRONICS', 'FASHION', 'HOME', 'SPORTS', 'OTHER'];
-const conditions = ['NEW', 'USED', 'REFURBISHED'];
+const categories = ['ELECTRONICS', 'FASHION', 'HOME', 'SPORTS', 'VEHICLES', 'COLLECTIBLES', 'ART', 'BOOKS', 'TOYS', 'MUSIC', 'OTHER'];
+const conditions = ['NEW', 'LIKE_NEW', 'USED', 'REFURBISHED', 'FOR_PARTS'];
 
 const validationSchema = Yup.object({
   title: Yup.string().required('Title is required'),

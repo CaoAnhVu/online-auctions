@@ -45,4 +45,7 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
 
     @Query("SELECT a.category, COUNT(a) FROM Auction a GROUP BY a.category")
     List<Object[]> countAuctionsByCategory();
+
+    @Query("SELECT a FROM Auction a WHERE a.status = 'ACTIVE' ORDER BY a.viewCount DESC")
+    List<Auction> findTopMostViewedActiveAuctions(Pageable pageable);
 } 

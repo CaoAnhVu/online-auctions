@@ -19,6 +19,7 @@ import {
   Fade,
   Menu,
   MenuItem,
+  Grid,
 } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout, getCurrentUser } from '../redux/slices/authSlice';
@@ -36,10 +37,14 @@ import HomeIcon from '@mui/icons-material/Home';
 import { styled } from '@mui/material/styles';
 import useTheme from '@mui/material/styles/useTheme';
 import logo from '../assets/images/thumbnail.png';
-// import MyBidsPage from '../pages/MyBidsPage';
-// import PaymentHistoryPage from '../pages/PaymentHistoryPage';
-// import PaymentSuccessPage from '../pages/PaymentSuccessPage';
 import LoadingSpinner from '../components/LoadingSpinner';
+import FacebookIcon from '@mui/icons-material/Facebook';
+import TwitterIcon from '@mui/icons-material/Twitter';
+import InstagramIcon from '@mui/icons-material/Instagram';
+import LinkedInIcon from '@mui/icons-material/LinkedIn';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import PhoneIcon from '@mui/icons-material/Phone';
+import EmailIcon from '@mui/icons-material/Email';
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
   borderRadius: '0 0 16px 16px',
@@ -91,14 +96,6 @@ function MainLayout() {
   const handleNotifClose = () => {
     setNotifAnchorEl(null);
   };
-
-  // useEffect(() => {
-  //   if (user?.roles?.includes('ROLE_ADMIN') && location.pathname !== '/admin') {
-  //     navigate('/admin', { replace: true });
-  //   }
-  // }, [user, navigate, location.pathname]);
-
-  // if (user?.roles?.includes('ROLE_ADMIN') && location.pathname === '/admin') return null;
 
   const handleLogout = () => {
     dispatch(logout());
@@ -288,12 +285,152 @@ function MainLayout() {
           </Box>
         </Fade>
       </Container>
-      <Box component="footer" sx={{ py: 3, bgcolor: 'background.paper', boxShadow: 3 }}>
-        <Container maxWidth="lg" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
-          <img src={logo} alt="logo" style={{ width: 32, height: 32 }} />
-          <Typography variant="body2" color="text.secondary" align="center" sx={{ fontWeight: 500 }}>
-            © {new Date().getFullYear()} Online Auctions. All rights reserved. | Đấu giá minh bạch - An toàn - Hiện đại
-          </Typography>
+      <Box
+        component="footer"
+        sx={{
+          py: 6,
+          bgcolor: 'background.paper',
+          boxShadow: 3,
+          borderTop: '1px solid',
+          borderColor: 'divider',
+        }}
+      >
+        <Container maxWidth="lg">
+          <Grid container spacing={4}>
+            {/* Company Info */}
+            <Grid item xs={12} sm={6} md={3}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: { xs: 'center', sm: 'flex-start' } }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <img src={logo} alt="logo" style={{ width: 40, height: 40, marginRight: 12 }} />
+                  <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                    Online Auctions
+                  </Typography>
+                </Box>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2, textAlign: { xs: 'center', sm: 'left' } }}>
+                  Nền tảng đấu giá trực tuyến hiện đại, minh bạch và an toàn. Tham gia mua bán, đấu giá sản phẩm mọi lúc, mọi nơi.
+                </Typography>
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                  <IconButton color="primary" size="small">
+                    <FacebookIcon />
+                  </IconButton>
+                  <IconButton color="primary" size="small">
+                    <TwitterIcon />
+                  </IconButton>
+                  <IconButton color="primary" size="small">
+                    <InstagramIcon />
+                  </IconButton>
+                  <IconButton color="primary" size="small">
+                    <LinkedInIcon />
+                  </IconButton>
+                </Box>
+              </Box>
+            </Grid>
+
+            {/* Quick Links */}
+            <Grid item xs={12} sm={6} md={3}>
+              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, textAlign: { xs: 'center', sm: 'left' } }}>
+                Liên kết nhanh
+              </Typography>
+              <List dense sx={{ p: 0 }}>
+                {['Về chúng tôi', 'Điều khoản sử dụng', 'Chính sách bảo mật', 'FAQ', 'Liên hệ'].map((text) => (
+                  <ListItem key={text} sx={{ p: 0, mb: 1, justifyContent: { xs: 'center', sm: 'flex-start' } }}>
+                    <ListItemText
+                      primary={text}
+                      sx={{
+                        '& .MuiListItemText-primary': {
+                          color: 'text.secondary',
+                          '&:hover': { color: 'primary.main' },
+                          cursor: 'pointer',
+                          transition: 'color 0.2s',
+                        },
+                      }}
+                    />
+                  </ListItem>
+                ))}
+              </List>
+            </Grid>
+
+            {/* Categories */}
+            <Grid item xs={12} sm={6} md={3}>
+              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, textAlign: { xs: 'center', sm: 'flex-start' } }}>
+                Danh mục
+              </Typography>
+              <List dense sx={{ p: 0 }}>
+                {['Điện thoại', 'Laptop', 'Đồng hồ', 'Phụ kiện', 'Khác'].map((text) => (
+                  <ListItem key={text} sx={{ p: 0, mb: 1, justifyContent: { xs: 'center', sm: 'flex-start' } }}>
+                    <ListItemText
+                      primary={text}
+                      sx={{
+                        '& .MuiListItemText-primary': {
+                          color: 'text.secondary',
+                          '&:hover': { color: 'primary.main' },
+                          cursor: 'pointer',
+                          transition: 'color 0.2s',
+                        },
+                      }}
+                    />
+                  </ListItem>
+                ))}
+              </List>
+            </Grid>
+
+            {/* Contact Info */}
+            <Grid item xs={12} sm={6} md={3}>
+              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, textAlign: { xs: 'center', sm: 'flex-start' } }}>
+                Liên hệ
+              </Typography>
+              <List dense sx={{ p: 0 }}>
+                <ListItem sx={{ p: 0, mb: 1, justifyContent: { xs: 'center', sm: 'flex-start' } }}>
+                  <ListItemIcon sx={{ minWidth: 36 }}>
+                    <LocationOnIcon color="primary" fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText primary="123 Đường ABC, Quận XYZ, TP.HCM" sx={{ '& .MuiListItemText-primary': { color: 'text.secondary' } }} />
+                </ListItem>
+                <ListItem sx={{ p: 0, mb: 1, justifyContent: { xs: 'center', sm: 'flex-start' } }}>
+                  <ListItemIcon sx={{ minWidth: 36 }}>
+                    <PhoneIcon color="primary" fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText primary="(84) 123-456-789" sx={{ '& .MuiListItemText-primary': { color: 'text.secondary' } }} />
+                </ListItem>
+                <ListItem sx={{ p: 0, mb: 1, justifyContent: { xs: 'center', sm: 'flex-start' } }}>
+                  <ListItemIcon sx={{ minWidth: 36 }}>
+                    <EmailIcon color="primary" fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText primary="support@onlineauctions.com" sx={{ '& .MuiListItemText-primary': { color: 'text.secondary' } }} />
+                </ListItem>
+              </List>
+            </Grid>
+          </Grid>
+
+          {/* Bottom Bar */}
+          <Box
+            sx={{
+              mt: 4,
+              pt: 3,
+              borderTop: '1px solid',
+              borderColor: 'divider',
+              display: 'flex',
+              flexDirection: { xs: 'column', sm: 'row' },
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 2,
+            }}
+          >
+            <Typography variant="body2" color="text.secondary" sx={{ textAlign: { xs: 'center', sm: 'left' } }}>
+              © {new Date().getFullYear()} Online Auctions. All rights reserved.
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 2 }}>
+              <Typography variant="body2" color="text.secondary" sx={{ cursor: 'pointer', '&:hover': { color: 'primary.main' } }}>
+                Điều khoản sử dụng
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ cursor: 'pointer', '&:hover': { color: 'primary.main' } }}>
+                Chính sách bảo mật
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ cursor: 'pointer', '&:hover': { color: 'primary.main' } }}>
+                Cookie Policy
+              </Typography>
+            </Box>
+          </Box>
         </Container>
       </Box>
     </Box>

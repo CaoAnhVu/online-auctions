@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { toast } from 'react-toastify';
 import api from '../../services/api';
+import axios from 'axios';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
 
@@ -85,6 +86,12 @@ export const placeBid = createAsyncThunk('auction/placeBid', async (bidData, { r
   }
 });
 
+// Async thunk for fetching featured auctions
+export const fetchFeaturedAuctions = createAsyncThunk('auctions/fetchFeatured', async () => {
+  const response = await axios.get(`${API_URL}/auctions/featured`);
+  return response.data;
+});
+
 const initialState = {
   auctions: [],
   currentAuction: null,
@@ -92,6 +99,7 @@ const initialState = {
   error: null,
   totalPages: 0,
   currentPage: 0,
+  featuredAuctions: [],
 };
 
 const auctionSlice = createSlice({
@@ -207,6 +215,19 @@ const auctionSlice = createSlice({
         state.loading = false;
         state.error = action.payload?.message || 'Failed to place bid';
         toast.error(state.error);
+      })
+      // Fetch Featured Auctions
+      .addCase(fetchFeaturedAuctions.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchFeaturedAuctions.fulfilled, (state, action) => {
+        state.loading = false;
+        state.featuredAuctions = action.payload;
+      })
+      .addCase(fetchFeaturedAuctions.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
       });
   },
 });

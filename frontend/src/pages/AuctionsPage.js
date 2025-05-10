@@ -40,6 +40,13 @@ function parseDate(date) {
   return new Date(date);
 }
 
+function truncate(str, n) {
+  if (str && str.length > n) {
+    return str.slice(0, n - 1) + '...';
+  }
+  return str;
+}
+
 function AuctionsPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -126,9 +133,14 @@ function AuctionsPage() {
                   <MenuItem value="">All</MenuItem>
                   <MenuItem value="ELECTRONICS">Electronics</MenuItem>
                   <MenuItem value="FASHION">Fashion</MenuItem>
-                  <MenuItem value="HOME">Home & Garden</MenuItem>
+                  <MenuItem value="HOME">Home</MenuItem>
                   <MenuItem value="SPORTS">Sports</MenuItem>
                   <MenuItem value="VEHICLES">Vehicles</MenuItem>
+                  <MenuItem value="COLLECTIBLES">Collectibles</MenuItem>
+                  <MenuItem value="ART">Art</MenuItem>
+                  <MenuItem value="BOOKS">Books</MenuItem>
+                  <MenuItem value="TOYS">Toys</MenuItem>
+                  <MenuItem value="MUSIC">Music</MenuItem>
                   <MenuItem value="OTHER">Other</MenuItem>
                 </Select>
               </FormControl>
@@ -206,10 +218,10 @@ function AuctionsPage() {
                       <CardMedia component="img" height="200" image={imgSrc} alt={auction.title} />
                       <CardContent>
                         <Typography gutterBottom variant="h5" component="div">
-                          {auction.title}
+                          {truncate(auction.title, 40)}
                         </Typography>
                         <Typography variant="body2" color="text.secondary" gutterBottom>
-                          {auction.description}
+                          {truncate(auction.description, 80)}
                         </Typography>
                         <Typography variant="h6" color="primary" gutterBottom>
                           {auction.currentPrice.toLocaleString()} VND

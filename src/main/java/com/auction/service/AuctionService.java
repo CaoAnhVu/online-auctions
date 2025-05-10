@@ -35,4 +35,5 @@ public interface AuctionService {
     BigDecimal getHighestBidForAuction(Long id);
     int getTotalBidsForAuction(Long id);
     void checkAndUpdateExpiredAuctions();
+    List<Auction> getTopMostViewedActiveAuctions(int limit);
 } 
