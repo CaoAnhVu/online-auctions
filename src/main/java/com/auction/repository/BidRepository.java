@@ -9,13 +9,17 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.EntityGraph;
 
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface BidRepository extends JpaRepository<Bid, Long> {
+    @EntityGraph(attributePaths = "bidder")
     Page<Bid> findByAuction(Auction auction, Pageable pageable);
+    
+    @EntityGraph(attributePaths = "bidder")
     Page<Bid> findByBidder(User bidder, Pageable pageable);
     
     @Query("SELECT b FROM Bid b WHERE b.auction = :auction AND b.winning = true")

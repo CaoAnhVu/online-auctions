@@ -195,6 +195,7 @@ public class AuctionController {
                         dto.setBidderId(bid.getBidder().getId());
                         dto.setAmount(bid.getAmount());
                         dto.setBidTime(bid.getBidTime());
+                        dto.setUsername(bid.getBidder().getUsername());
                         return dto;
                     }).toList()
             );

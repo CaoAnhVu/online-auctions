@@ -37,13 +37,15 @@ export const getCurrentUser = createAsyncThunk('auth/getCurrentUser', async (_, 
   }
 });
 
-export const updateUser = createAsyncThunk('auth/updateUser', async (userData) => {
-  const response = await api.put(`${API_URL}/auth/update`, userData);
+export const updateUser = createAsyncThunk('auth/updateUser', async (userData, { getState }) => {
+  const userId = getState().auth.user?.id;
+  const response = await api.put(`/users/${userId}`, userData);
   return response.data;
 });
 
-export const changePassword = createAsyncThunk('auth/changePassword', async (passwordData) => {
-  const response = await api.post(`${API_URL}/auth/change-password`, passwordData);
+export const changePassword = createAsyncThunk('auth/changePassword', async (passwordData, { getState }) => {
+  const userId = getState().auth.user?.id;
+  const response = await api.put(`/users/${userId}/change-password`, passwordData);
   return response.data;
 });
 
@@ -139,6 +141,7 @@ const authSlice = createSlice({
       .addCase(updateUser.fulfilled, (state, action) => {
         state.loading = false;
         state.user = action.payload;
+        toast.success('Cập nhật thông tin thành công!');
       })
       .addCase(updateUser.rejected, (state, action) => {
         state.loading = false;

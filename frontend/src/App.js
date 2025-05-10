@@ -5,6 +5,8 @@ import theme from './theme';
 import AppRoutes from './routes/AppRoutes';
 import { useSelector } from 'react-redux';
 import LoadingSpinner from './components/LoadingSpinner';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   const { user, token } = useSelector((state) => state.auth);
@@ -19,6 +21,7 @@ function App() {
       <Router>
         <AppRoutes />
       </Router>
+      <ToastContainer position="top-right" autoClose={3000} />
     </ThemeProvider>
   );
 }

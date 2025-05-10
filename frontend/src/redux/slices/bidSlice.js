@@ -1,8 +1,9 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../../services/api';
-export const getUserBids = createAsyncThunk('bid/getUserBids', async (_, { rejectWithValue }) => {
+export const getUserBids = createAsyncThunk('bid/getUserBids', async (_, { getState, rejectWithValue }) => {
   try {
-    const response = await api.get('/bids/user');
+    const userId = getState().auth.user?.id;
+    const response = await api.get(`/bids/user/${userId}`);
     return response.data;
   } catch (error) {
     return rejectWithValue(error.response.data);
@@ -43,7 +44,7 @@ const bidSlice = createSlice({
       })
       .addCase(getUserBids.fulfilled, (state, action) => {
         state.loading = false;
-        state.bids = action.payload;
+        state.bids = Array.isArray(action.payload) ? action.payload : action.payload?.content || [];
       })
       .addCase(getUserBids.rejected, (state, action) => {
         state.loading = false;

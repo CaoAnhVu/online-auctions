@@ -227,4 +227,15 @@ public class UserServiceImpl implements UserService {
         user.setBlocked(false);
         userRepository.save(user);
     }
+
+    @Override
+    @Transactional
+    public User updateUserProfile(Long id, com.auction.dto.UpdateUserRequest request) {
+        User user = userRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+        if (request.getFullName() != null) user.setFullName(request.getFullName());
+        if (request.getEmail() != null) user.setEmail(request.getEmail());
+        if (request.getPhoneNumber() != null) user.setPhoneNumber(request.getPhoneNumber());
+        return userRepository.save(user);
+    }
 } 

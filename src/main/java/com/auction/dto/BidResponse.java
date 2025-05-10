@@ -16,4 +16,5 @@ public class BidResponse {
     private UserDTO bidder;
     private AuctionDTO auction;
     private boolean isWinning;
+    private String username;
 } 

@@ -37,4 +37,6 @@ public interface UserService {
     // Blocking management
     void blockUser(Long id);
     void unblockUser(Long id);
+
+    User updateUserProfile(Long id, com.auction.dto.UpdateUserRequest request);
 } 

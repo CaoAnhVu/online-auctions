@@ -2,6 +2,8 @@ package com.auction.controller;
 
 import com.auction.dto.SignupRequest;
 import com.auction.dto.UserResponse;
+import com.auction.dto.UpdateUserRequest;
+import com.auction.dto.ChangePasswordRequest;
 import com.auction.model.User;
 import com.auction.model.ERole;
 import com.auction.service.UserService;
@@ -36,8 +38,8 @@ public class UserController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
-    public ResponseEntity<UserResponse> updateUser(@PathVariable Long id, @RequestBody User updatedUser) {
-        User user = userService.updateUser(id, updatedUser);
+    public ResponseEntity<UserResponse> updateUser(@PathVariable Long id, @RequestBody UpdateUserRequest request) {
+        User user = userService.updateUserProfile(id, request);
         return ResponseEntity.ok(mapToUserResponse(user));
     }
 
@@ -59,6 +61,13 @@ public class UserController {
     public ResponseEntity<UserResponse> makeFirstAdmin(@PathVariable Long id) {
         User user = userService.makeFirstAdmin(id);
         return ResponseEntity.ok(mapToUserResponse(user));
+    }
+
+    @PutMapping("/{id}/change-password")
+    @PreAuthorize("#id == authentication.principal.id")
+    public ResponseEntity<?> changePassword(@PathVariable Long id, @RequestBody ChangePasswordRequest req) {
+        userService.changePassword(id, req.getCurrentPassword(), req.getNewPassword());
+        return ResponseEntity.ok().build();
     }
 
     private UserResponse mapToUserResponse(User user) {

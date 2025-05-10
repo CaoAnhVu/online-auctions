@@ -104,6 +104,7 @@ public class BidController {
             response.setId(bid.getId());
             response.setAuctionId(bid.getAuction().getId());
             response.setBidderId(bid.getBidder().getId());
+            response.setUsername(bid.getBidder().getUsername());
             response.setAmount(bid.getAmount());
             response.setBidTime(bid.getBidTime());
             response.setWinning(bid.isWinning());

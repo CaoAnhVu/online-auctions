@@ -25,4 +25,5 @@ public class BidDTO {
 
     private LocalDateTime bidTime;
     private String status;
+    private String username;
 } 

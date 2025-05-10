@@ -280,9 +280,7 @@ function AuctionDetailPage() {
                 <ListItem key={bid.id}>
                   <ListItemText
                     primary={`${bid.amount.toLocaleString()} VND`}
-                    secondary={
-                      (bid.user && bid.user.username ? bid.user.username : `User #${bid.bidderId}`) + ' - ' + (parseDateTime(bid.createdAt) ? format(parseDateTime(bid.createdAt), 'PPpp') : 'N/A')
-                    }
+                    secondary={(bid.username ? bid.username : `User #${bid.bidderId}`) + ' - ' + (parseDateTime(bid.bidTime) ? format(parseDateTime(bid.bidTime), 'PPpp') : 'N/A')}
                   />
                 </ListItem>
               ))}

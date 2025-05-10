@@ -5,6 +5,13 @@ import { updateUser, changePassword } from '../redux/slices/authSlice';
 import { getUserBids } from '../redux/slices/bidSlice';
 import { getUserPayments } from '../redux/slices/paymentSlice';
 
+function parseBidTime(bidTime) {
+  if (Array.isArray(bidTime) && bidTime.length >= 6) {
+    return new Date(bidTime[0], bidTime[1] - 1, bidTime[2], bidTime[3], bidTime[4], bidTime[5]);
+  }
+  return null;
+}
+
 function TabPanel({ children, value, index }) {
   return <div hidden={value !== index}>{value === index && <Box sx={{ p: 3 }}>{children}</Box>}</div>;
 }
@@ -126,16 +133,19 @@ function ProfilePage() {
           {bidsLoading ? (
             <CircularProgress />
           ) : (
-            <Box>
-              {bids?.map((bid) => (
-                <Paper key={bid.id} sx={{ p: 2, mb: 2 }}>
-                  <Typography variant="h6">{bid.auction.title}</Typography>
-                  <Typography>Bid Amount: {bid.amount.toLocaleString()} VND</Typography>
-                  <Typography>Time: {new Date(bid.createdAt).toLocaleString()}</Typography>
-                  <Typography>Status: {bid.status}</Typography>
-                </Paper>
-              ))}
-            </Box>
+            <>
+              {console.log('Bids data:', bids)}
+              <Box>
+                {bids?.map((bid) => (
+                  <Paper key={bid.id} sx={{ p: 2, mb: 2 }}>
+                    <Typography variant="h6">{bid.auction ? bid.auction.title : 'No auction info'}</Typography>
+                    <Typography>Bid Amount: {bid.amount?.toLocaleString()} VND</Typography>
+                    <Typography>Time: {bid.bidTime ? parseBidTime(bid.bidTime).toLocaleString() : bid.createdAt ? new Date(bid.createdAt).toLocaleString() : ''}</Typography>
+                    <Typography>Status: {bid.status || (bid.winning ? 'Winning' : 'Not winning')}</Typography>
+                  </Paper>
+                ))}
+              </Box>
+            </>
           )}
         </TabPanel>
 
