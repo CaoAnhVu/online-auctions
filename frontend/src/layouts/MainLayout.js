@@ -45,6 +45,7 @@ import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import PhoneIcon from '@mui/icons-material/Phone';
 import EmailIcon from '@mui/icons-material/Email';
+import websocketService from '../services/websocket';
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
   borderRadius: '0 0 16px 16px',
@@ -75,6 +76,10 @@ function MainLayout() {
   React.useEffect(() => {
     if (token && !user) {
       dispatch(getCurrentUser());
+    }
+    // Kết nối websocket khi có token
+    if (token) {
+      websocketService.connect(token);
     }
   }, [token, user, dispatch]);
 

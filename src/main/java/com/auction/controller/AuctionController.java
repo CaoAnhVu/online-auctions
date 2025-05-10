@@ -101,7 +101,15 @@ public class AuctionController {
     public ResponseEntity<AuctionResponse> getAuction(@PathVariable Long id) {
         Auction auction = auctionService.getAuctionById(id);
         auctionService.incrementViewCount(id);
-        return ResponseEntity.ok(mapToAuctionResponse(auction));
+        AuctionResponse response = mapToAuctionResponse(auction);
+        // Log dữ liệu trả về
+        System.out.println("[REST] AuctionResponse: " + response);
+        if (response.getBids() != null) {
+            response.getBids().forEach(bid -> {
+                System.out.println("[REST] Bid: id=" + bid.getId() + ", bidderId=" + bid.getBidderId() + ", username=" + bid.getUsername());
+            });
+        }
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/{id}")
@@ -196,6 +204,8 @@ public class AuctionController {
                         dto.setAmount(bid.getAmount());
                         dto.setBidTime(bid.getBidTime());
                         dto.setUsername(bid.getBidder().getUsername());
+                        // Log từng bid mapping
+                        System.out.println("[mapToAuctionResponse] BidDTO: id=" + dto.getId() + ", bidderId=" + dto.getBidderId() + ", username=" + dto.getUsername());
                         return dto;
                     }).toList()
             );

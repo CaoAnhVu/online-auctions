@@ -87,9 +87,16 @@ export const placeBid = createAsyncThunk('auction/placeBid', async (bidData, { r
 });
 
 // Async thunk for fetching featured auctions
-export const fetchFeaturedAuctions = createAsyncThunk('auctions/fetchFeatured', async () => {
-  const response = await axios.get(`${API_URL}/auctions/featured`);
-  return response.data;
+export const fetchFeaturedAuctions = createAsyncThunk('auctions/fetchFeatured', async (_, { getState, rejectWithValue }) => {
+  try {
+    const { token } = getState().auth;
+    const response = await axios.get(`${API_URL}/auctions/featured`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  } catch (error) {
+    return rejectWithValue(error.response?.data || { message: 'Failed to fetch featured auctions' });
+  }
 });
 
 const initialState = {
@@ -111,6 +118,12 @@ const auctionSlice = createSlice({
     },
     clearError: (state) => {
       state.error = null;
+    },
+    auctionUpdated: (state, action) => {
+      console.log('[Redux] auctionUpdated payload:', action.payload);
+      state.currentAuction = action.payload;
+      state.loading = false;
+      state.auctions = state.auctions.map((auction) => (auction.id === action.payload.id ? action.payload : auction));
     },
   },
   extraReducers: (builder) => {
@@ -232,5 +245,5 @@ const auctionSlice = createSlice({
   },
 });
 
-export const { clearCurrentAuction, clearError } = auctionSlice.actions;
+export const { clearCurrentAuction, clearError, auctionUpdated } = auctionSlice.actions;
 export default auctionSlice.reducer;

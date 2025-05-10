@@ -59,24 +59,59 @@ function AuctionDetailPage() {
   const [lastBidId, setLastBidId] = useState(null);
   const [lastBidUser, setLastBidUser] = useState(null);
 
+  console.log('AuctionDetailPage render', currentAuction);
+
   useEffect(() => {
     dispatch(fetchAuctionById(id));
   }, [dispatch, id]);
 
   // Subscribe websocket vào auctionId khi vào trang, unsubscribe khi rời trang
   useEffect(() => {
-    websocketService.subscribeToAuction(id);
+    let interval;
+    function trySubscribe() {
+      if (websocketService.client?.connected) {
+        websocketService.subscribeToAuction(id);
+        console.log('[AuctionDetailPage] Subscribed to auction:', id);
+      } else {
+        interval = setInterval(() => {
+          if (websocketService.client?.connected) {
+            websocketService.subscribeToAuction(id);
+            console.log('[AuctionDetailPage] Subscribed to auction:', id);
+            clearInterval(interval);
+          }
+        }, 500);
+      }
+    }
+    trySubscribe();
     return () => {
+      if (interval) clearInterval(interval);
       websocketService.unsubscribeFromAuction(id);
+      console.log('[AuctionDetailPage] Unsubscribed from auction:', id);
     };
   }, [id]);
 
   // Theo dõi bid mới realtime để hiện toast
   useEffect(() => {
     if (currentAuction && currentAuction.bids && currentAuction.bids.length > 0) {
-      const latestBid = currentAuction.bids[currentAuction.bids.length - 1];
-      if (lastBidId && latestBid.id !== lastBidId && latestBid.user?.id !== user?.id) {
-        toast.info(`Có người vừa đặt giá mới: ${latestBid.amount.toLocaleString()} VND!`);
+      const bids = currentAuction.bids;
+      const latestBid = bids[bids.length - 1];
+      const prevBid = bids.length > 1 ? bids[bids.length - 2] : null;
+
+      // Log kiểm tra
+      console.log('== Bid Debug ==');
+      console.log('latestBid:', latestBid);
+      console.log('prevBid:', prevBid);
+      console.log('currentUser:', user);
+
+      if (lastBidId && latestBid.id !== lastBidId) {
+        // Người vừa đặt giá không nhận toast
+        if (latestBid.bidderId === user?.id) {
+          toast.success('Bid placed successfully!');
+        } else if (prevBid && prevBid.bidderId === user?.id) {
+          toast.warn('Bạn vừa bị vượt giá!');
+        } else {
+          toast.info(`Có người vừa đặt giá mới: ${latestBid.amount.toLocaleString()} VND!`);
+        }
       }
       setLastBidId(latestBid.id);
     }
@@ -88,9 +123,14 @@ function AuctionDetailPage() {
       alert('Bid amount must be higher than current price');
       return;
     }
-    await dispatch(placeBid({ auctionId: Number(id), amount: Number(bidAmount) }));
-    await dispatch(fetchAuctionById(id));
-    setBidAmount('');
+    try {
+      await dispatch(placeBid({ auctionId: Number(id), amount: Number(bidAmount) }));
+      setBidAmount('');
+      // Không cần gọi fetchAuctionById vì WebSocket sẽ tự động cập nhật
+    } catch (error) {
+      console.error('Error placing bid:', error);
+      toast.error('Failed to place bid. Please try again.');
+    }
   };
 
   const handleAuctionEnd = () => {
@@ -106,6 +146,7 @@ function AuctionDetailPage() {
   const isAuctionEnded = currentAuction?.endTime && new Date(currentAuction.endTime) <= new Date();
   const isSellerUser = currentAuction?.seller?.id === user?.id;
   const minimumBid = currentAuction?.currentPrice + (currentAuction?.minimumBidIncrement || 0);
+  console.log('currentPrice:', currentAuction?.currentPrice, 'minIncrement:', currentAuction?.minimumBidIncrement, 'minimumBid:', minimumBid);
 
   if (loading) {
     return (
@@ -237,6 +278,7 @@ function AuctionDetailPage() {
                   Minimum bid: {minimumBid.toLocaleString()} VND
                 </Typography>
                 <TextField
+                  key={currentAuction.currentPrice}
                   fullWidth
                   label="Your Bid (VND)"
                   type="number"

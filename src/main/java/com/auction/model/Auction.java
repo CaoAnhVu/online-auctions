@@ -75,6 +75,10 @@ public class Auction {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "winner_id")
+    private User winner;
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
