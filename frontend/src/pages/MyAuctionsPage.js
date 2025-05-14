@@ -65,14 +65,24 @@ function MyAuctionsPage() {
                   <Typography variant="h5" color="primary" gutterBottom>
                     {auction.currentPrice.toLocaleString()} VND
                   </Typography>
-                  <Typography variant="body2" color="text.secondary" gutterBottom>
-                    End Time: {auction.endTime}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" gutterBottom>
-                    Created At: {auction.createdAt ? new Date(auction.createdAt).toLocaleString() : 'N/A'}
-                  </Typography>
                   <Typography variant="body2" color="text.secondary" gutterBottom noWrap>
                     {auction.description}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" gutterBottom>
+                    Start Time:{' '}
+                    {auction.startTime
+                      ? `${new Date(auction.startTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })} ${new Date(
+                          auction.startTime
+                        ).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })}`
+                      : 'N/A'}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" gutterBottom>
+                    End Time:{' '}
+                    {auction.endTime
+                      ? `${new Date(auction.endTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })} ${new Date(
+                          auction.endTime
+                        ).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })}`
+                      : 'N/A'}
                   </Typography>
                   <Stack direction="row" spacing={2} mt={1}>
                     <Typography variant="caption" color="text.secondary">

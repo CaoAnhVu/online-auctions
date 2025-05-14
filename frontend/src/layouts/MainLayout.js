@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import {
   AppBar,
@@ -23,7 +23,7 @@ import {
 } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout, getCurrentUser } from '../redux/slices/authSlice';
-import { getNotifications } from '../redux/slices/notificationSlice';
+import { getNotifications, clearNewStatus } from '../redux/slices/notificationSlice';
 import { getUserPayments } from '../redux/slices/paymentSlice';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import GavelIcon from '@mui/icons-material/Gavel';
@@ -34,7 +34,7 @@ import HistoryIcon from '@mui/icons-material/History';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import MenuIcon from '@mui/icons-material/Menu';
 import HomeIcon from '@mui/icons-material/Home';
-import { styled } from '@mui/material/styles';
+import { styled, keyframes } from '@mui/material/styles';
 import useTheme from '@mui/material/styles/useTheme';
 import logo from '../assets/images/thumbnail.png';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -61,6 +61,29 @@ const StyledAppBar = styled(AppBar)(({ theme }) => ({
   zIndex: theme.zIndex.appBar,
 }));
 
+// Hiệu ứng nhấp nháy cho badge thông báo
+const pulse = keyframes`
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+`;
+
+const AnimatedBadge = styled(Badge)(({ theme, hasnew }) => ({
+  '& .MuiBadge-badge': {
+    animation: hasnew === 'true' ? `${pulse} 1.5s infinite` : 'none',
+    transition: 'all 0.3s ease',
+  },
+}));
+
 function MainLayout() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -80,19 +103,45 @@ function MainLayout() {
     // Kết nối websocket khi có token
     if (token) {
       websocketService.connect(token);
+
+      // Subscribe to user-specific notifications if user exists
+      if (user && user.username) {
+        websocketService.subscribeToUserNotifications(user.username);
+      }
     }
+
+    return () => {
+      // Cleanup WebSocket connection when component unmounts
+      if (token) {
+        websocketService.disconnect();
+      }
+    };
   }, [token, user, dispatch]);
 
   React.useEffect(() => {
     if (user && user.username && !user.roles?.includes('ROLE_ADMIN') && location.pathname !== '/login') {
       dispatch(getNotifications());
       dispatch(getUserPayments());
+
+      // Thiết lập polling để cập nhật thông báo mỗi 15 giây
+      const intervalId = setInterval(() => {
+        dispatch(getNotifications());
+        dispatch(getUserPayments());
+      }, 15000);
+
+      return () => clearInterval(intervalId);
     }
   }, [dispatch, user, location.pathname]);
 
-  // Tính tổng số thông báo chưa đọc
-  const unreadGeneral = Array.isArray(notifications) ? notifications.filter((n) => !n.read).length : 0;
-  const unreadPayments = payments?.filter((p) => p.status === 'PENDING' && !p.notified).length || 0;
+  // Tính tổng số thông báo chưa đọc - sử dụng useMemo để tránh tính toán lại khi không cần thiết
+  const unreadGeneral = React.useMemo(() => {
+    return Array.isArray(notifications) ? notifications.filter((n) => !n.read).length : 0;
+  }, [notifications]);
+
+  const unreadPayments = React.useMemo(() => {
+    return Array.isArray(payments) ? payments.filter((p) => p.status === 'PENDING' && !p.notified).length : 0;
+  }, [payments]);
+
   const unreadNotifications = unreadGeneral + unreadPayments;
 
   const handleNotifClick = (event) => {
@@ -100,6 +149,7 @@ function MainLayout() {
   };
   const handleNotifClose = () => {
     setNotifAnchorEl(null);
+    dispatch(clearNewStatus());
   };
 
   const handleLogout = () => {
@@ -208,9 +258,9 @@ function MainLayout() {
                 {renderMenuButtons().filter((btn) => !btn.key || btn.key !== 'Profile')}
                 {/* Notification tổng hợp */}
                 <IconButton color="inherit" onClick={handleNotifClick} sx={{ position: 'relative' }}>
-                  <Badge badgeContent={unreadNotifications} color="error">
+                  <AnimatedBadge badgeContent={unreadNotifications} color="error" hasnew={notifications?.some((n) => n.isNew) ? 'true' : 'false'}>
                     <NotificationsIcon />
-                  </Badge>
+                  </AnimatedBadge>
                 </IconButton>
                 {/* Menu notification */}
                 <Menu anchorEl={notifAnchorEl} open={Boolean(notifAnchorEl)} onClose={handleNotifClose} PaperProps={{ sx: { width: 350, maxHeight: 500 } }}>
@@ -226,8 +276,19 @@ function MainLayout() {
                     </MenuItem>
                   ) : (
                     <>
-                      {notifications?.map((notification) => (
-                        <MenuItem key={notification.id} onClick={handleNotifClose} sx={{ alignItems: 'flex-start' }}>
+                      {notifications?.map((notification, index) => (
+                        <MenuItem
+                          key={notification.id}
+                          onClick={handleNotifClose}
+                          sx={{
+                            alignItems: 'flex-start',
+                            bgcolor: index === 0 && notification.isNew ? 'rgba(25, 118, 210, 0.12)' : 'transparent',
+                            transition: 'background-color 0.3s',
+                            '&:hover': {
+                              bgcolor: index === 0 && notification.isNew ? 'rgba(25, 118, 210, 0.18)' : 'rgba(0, 0, 0, 0.04)',
+                            },
+                          }}
+                        >
                           <Box>
                             <Typography variant="body2" fontWeight={notification.read ? 400 : 700}>
                               {notification.title || 'Notification'}

@@ -4,6 +4,7 @@ import com.auction.dto.AuctionRequest;
 import com.auction.dto.AuctionResponse;
 import com.auction.model.Auction;
 import com.auction.model.AuctionStatus;
+import com.auction.model.ItemCondition;
 import com.auction.service.AuctionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

@@ -9,13 +9,14 @@ import com.auction.repository.BidRepository;
 import com.auction.payment.repository.PaymentOrderRepository;
 import com.auction.payment.model.PaymentOrder;
 import com.auction.model.AuctionStatus;
+import com.auction.enums.PaymentStatus;
 import lombok.RequiredArgsConstructor;
 
-import java.time.LocalDate;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
-import java.math.BigDecimal;
 
 @Service
 @RequiredArgsConstructor
@@ -28,50 +29,39 @@ public class AdminStatsServiceImpl implements AdminStatsService {
     @Override
     public AdminStatsResponse getStats(String range) {
         AdminStatsResponse stats = new AdminStatsResponse();
+        LocalDateTime fromDate = getFromDate(range);
 
-        // Tổng số user
+        // Thống kê cơ bản
         stats.setTotalUsers(userRepository.count());
-
-        // User mới trong tuần
-        LocalDateTime fromDate = LocalDate.now().minusWeeks(1).atStartOfDay();
-        stats.setNewUsers(userRepository.countByCreatedAtAfter(fromDate));
-
-        // Tổng số đấu giá
         stats.setTotalAuctions(auctionRepository.count());
-
-        // Đấu giá đang hoạt động
-        stats.setActiveAuctions(auctionRepository.countByStatus(AuctionStatus.ACTIVE));
-
-        // Tổng số lượt bid
         stats.setTotalBids(bidRepository.count());
 
-        // Tổng doanh thu (tổng payment đã PAID)
-        BigDecimal totalRevenue = paymentOrderRepository.sumAmountByStatus(PaymentOrder.PaymentStatus.PAID);
+        // Tổng doanh thu (tổng payment đã COMPLETED)
+        BigDecimal totalRevenue = paymentOrderRepository.sumAmountByStatus(PaymentStatus.COMPLETED);
         stats.setTotalRevenue(totalRevenue != null ? totalRevenue.longValue() : 0);
 
         // Thống kê dailyStats
-        List<Object[]> dailyStatsRaw = paymentOrderRepository.getDailyRevenueAndActiveUsers(PaymentOrder.PaymentStatus.PAID, fromDate);
+        List<Object[]> dailyStatsRaw = paymentOrderRepository.getDailyRevenueAndActiveUsers(PaymentStatus.COMPLETED, fromDate);
         List<AdminStatsResponse.DailyStat> dailyStats = new ArrayList<>();
         for (Object[] row : dailyStatsRaw) {
-            AdminStatsResponse.DailyStat stat = new AdminStatsResponse.DailyStat();
-            stat.setDate(row[0].toString());
-            stat.setRevenue(((BigDecimal) row[1]).longValue());
-            stat.setActiveUsers(((Number) row[2]).longValue());
-            dailyStats.add(stat);
+            AdminStatsResponse.DailyStat dailyStat = new AdminStatsResponse.DailyStat();
+            dailyStat.setDate(row[0].toString());
+            dailyStat.setRevenue(((BigDecimal) row[1]).longValue());
+            dailyStat.setActiveUsers(((Long) row[2]).intValue());
+            dailyStats.add(dailyStat);
         }
         stats.setDailyStats(dailyStats);
 
-        // Thống kê theo danh mục
-        List<Object[]> categoryStatsRaw = auctionRepository.countAuctionsByCategory();
-        List<AdminStatsResponse.CategoryStat> categoryStats = new ArrayList<>();
-        for (Object[] row : categoryStatsRaw) {
-            AdminStatsResponse.CategoryStat stat = new AdminStatsResponse.CategoryStat();
-            stat.setCategory((String) row[0]);
-            stat.setCount(((Number) row[1]).longValue());
-            categoryStats.add(stat);
-        }
-        stats.setCategoryStats(categoryStats);
-
         return stats;
+    }
+
+    private LocalDateTime getFromDate(String range) {
+        LocalDateTime now = LocalDateTime.now();
+        return switch (range.toLowerCase()) {
+            case "week" -> now.minus(7, ChronoUnit.DAYS);
+            case "month" -> now.minus(30, ChronoUnit.DAYS);
+            case "year" -> now.minus(365, ChronoUnit.DAYS);
+            default -> now.minus(7, ChronoUnit.DAYS);
+        };
     }
 }

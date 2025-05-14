@@ -5,6 +5,8 @@ import com.auction.model.*;
 import com.auction.service.*;
 import com.auction.payment.model.PaymentOrder;
 import com.auction.payment.repository.PaymentOrderRepository;
+import com.auction.enums.PaymentStatus;
+import com.auction.payment.dto.PaymentResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -167,8 +169,12 @@ public class AdminController {
 
     private PaymentResponse mapToPaymentResponse(PaymentOrder payment) {
         PaymentResponse response = new PaymentResponse();
-        response.setStatus(payment.getStatus().name());
-        response.setAmount(payment.getAmount().longValue());
+        response.setStatus(payment.getStatus());
+        response.setAmount(payment.getAmount());
+        response.setOrderCode(payment.getOrderCode());
+        response.setPaymentMethod(payment.getPaymentMethod());
+        response.setPaymentUrl(payment.getPaymentUrl());
+        response.setExpiresAt(payment.getExpiresAt());
         return response;
     }
 }

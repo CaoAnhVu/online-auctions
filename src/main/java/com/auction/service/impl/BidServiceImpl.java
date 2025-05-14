@@ -4,6 +4,7 @@ import com.auction.model.Auction;
 import com.auction.model.AuctionStatus;
 import com.auction.model.Bid;
 import com.auction.model.User;
+import com.auction.model.ItemCondition;
 import com.auction.repository.BidRepository;
 import com.auction.service.*;
 import lombok.RequiredArgsConstructor;

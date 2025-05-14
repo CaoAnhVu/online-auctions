@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Congratulations - You Won the Auction!</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .header {
+        text-align: center;
+        padding: 20px 0;
+        border-bottom: 2px solid #eee;
+        background-color: #f8f9fa;
+      }
+      .congratulations {
+        text-align: center;
+        padding: 20px;
+        background-color: #e8f5e9;
+        border-radius: 8px;
+        margin: 20px 0;
+      }
+      .content {
+        padding: 20px 0;
+      }
+      .auction-details {
+        background: #f9f9f9;
+        padding: 15px;
+        border-radius: 5px;
+        margin: 20px 0;
+      }
+      .auction-details table {
+        width: 100%;
+      }
+      .auction-details td {
+        padding: 8px;
+      }
+      .payment-section {
+        background: #fff3e0;
+        padding: 20px;
+        border-radius: 5px;
+        margin: 20px 0;
+      }
+      .btn {
+        display: inline-block;
+        padding: 12px 24px;
+        background-color: #1a73e8;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        margin: 10px;
+        font-weight: bold;
+      }
+      .footer {
+        text-align: center;
+        padding-top: 20px;
+        border-top: 1px solid #eee;
+        font-size: 0.9em;
+        color: #666;
+      }
+      .next-steps {
+        background: #e3f2fd;
+        padding: 15px;
+        border-radius: 5px;
+        margin: 20px 0;
+      }
+      .next-steps ul {
+        margin: 10px 0;
+        padding-left: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>🎉 Congratulations! 🎉</h1>
+    </div>
+
+    <div class="congratulations">
+      <h2>You Won the Auction!</h2>
+      <p>Dear <span th:text="${userName}">User</span>,</p>
+      <p>We're excited to inform you that you've won the following auction:</p>
+    </div>
+
+    <div class="content">
+      <div class="auction-details">
+        <table>
+          <tr>
+            <td><strong>Item:</strong></td>
+            <td th:text="${auctionTitle}">Auction Item</td>
+          </tr>
+          <tr>
+            <td><strong>Your Winning Bid:</strong></td>
+            <td th:text="${#numbers.formatDecimal(winningBid, 0, 'COMMA', 0, 'POINT')} + ' VND'">1,000,000 VND</td>
+          </tr>
+          <tr>
+            <td><strong>Auction End Time:</strong></td>
+            <td th:text="${auctionEndTime}">2024-01-01 12:00</td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="payment-section">
+        <h3>Payment Information</h3>
+        <p>To complete your purchase, please proceed with the payment:</p>
+        <div style="text-align: center">
+          <a class="btn" th:href="${paymentUrl}">Pay Now with VNPay</a>
+        </div>
+        <p><strong>Payment Details:</strong></p>
+        <ul>
+          <li>Amount: <span th:text="${#numbers.formatDecimal(winningBid, 0, 'COMMA', 0, 'POINT')} + ' VND'">1,000,000 VND</span></li>
+          <li>Order Code: <span th:text="${orderCode}">ORD123456</span></li>
+          <li>Due Date: <span th:text="${paymentDueDate}">2024-01-03 12:00</span></li>
+        </ul>
+      </div>
+
+      <div class="next-steps">
+        <h3>Next Steps:</h3>
+        <ul>
+          <li>Complete your payment within 48 hours</li>
+          <li>Keep your order code for reference</li>
+          <li>You'll receive a confirmation email after payment</li>
+          <li>The seller will contact you about delivery arrangements</li>
+        </ul>
+      </div>
+
+      <div style="text-align: center; margin-top: 20px">
+        <a class="btn" th:href="${auctionDetailsUrl}">View Auction Details</a>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>Thank you for participating in our auction!</p>
+      <p>If you have any questions, please contact our support team.</p>
+      <p>© 2024 Online Auction Platform. All rights reserved.</p>
+    </div>
+  </body>
+</html>

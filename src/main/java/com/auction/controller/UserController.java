@@ -75,9 +75,12 @@ public class UserController {
         response.setId(user.getId());
         response.setUsername(user.getUsername());
         response.setEmail(user.getEmail());
+        response.setFullName(user.getFullName());
+        response.setPhoneNumber(user.getPhoneNumber());
         response.setRoles(user.getRoles().stream()
             .map(role -> role.getName().name())
             .collect(Collectors.toSet()));
+        response.setBlocked(user.getBlocked());
         return response;
     }
 } 

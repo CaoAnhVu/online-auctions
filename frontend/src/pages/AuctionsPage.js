@@ -15,36 +15,38 @@ import {
   MenuItem,
   Card,
   CardContent,
-  CardMedia,
   CardActions,
   Chip,
   Pagination,
   InputAdornment,
   CircularProgress,
   Alert,
+  Stack,
 } from '@mui/material';
 import { Search as SearchIcon } from '@mui/icons-material';
 import { fetchAuctions } from '../redux/slices/auctionSlice';
-import { format } from 'date-fns';
 import defaultAuctionImg from '../assets/images/no_image.png';
 
-function parseDate(date) {
-  if (!date) return null;
-  if (typeof date === 'string') return new Date(date);
-  if (Array.isArray(date)) {
-    // [year, month, day, hour, minute, ...]
-    // Lưu ý: Tháng trong JS Date là 0-based!
-    const [year, month, day, hour = 0, minute = 0, second = 0] = date;
-    return new Date(year, month - 1, day, hour, minute, second);
-  }
-  return new Date(date);
-}
+// Hàm định dạng ngày tháng
+function formatDate(dateString) {
+  if (!dateString) return 'N/A';
 
-function truncate(str, n) {
-  if (str && str.length > n) {
-    return str.slice(0, n - 1) + '...';
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return 'N/A';
+
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+
+    return `${hours}:${minutes}:${seconds} ${day}/${month}/${year}`;
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return 'N/A';
   }
-  return str;
 }
 
 function AuctionsPage() {
@@ -65,6 +67,14 @@ function AuctionsPage() {
   useEffect(() => {
     dispatch(fetchAuctions({ page: page - 1, ...searchParams }));
   }, [dispatch, page, searchParams]);
+
+  useEffect(() => {
+    if (auctions && auctions.length > 0) {
+      console.log('First auction data:', auctions[0]);
+      console.log('Created At:', auctions[0].createdAt);
+      console.log('End Time:', auctions[0].endTime);
+    }
+  }, [auctions]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -166,9 +176,9 @@ function AuctionsPage() {
               <FormControl fullWidth>
                 <InputLabel>Sort By</InputLabel>
                 <Select value={searchParams.sortBy} label="Sort By" onChange={(e) => setSearchParams({ ...searchParams, sortBy: e.target.value })}>
+                  <MenuItem value="startTime">Start Time</MenuItem>
                   <MenuItem value="endTime">End Time</MenuItem>
                   <MenuItem value="currentPrice">Current Price</MenuItem>
-                  <MenuItem value="createdAt">Created Date</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -214,27 +224,46 @@ function AuctionsPage() {
                 }
                 return (
                   <Grid item xs={12} sm={6} md={4} key={auction.id}>
-                    <Card>
-                      <CardMedia component="img" height="200" image={imgSrc} alt={auction.title} />
+                    <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                      <Box sx={{ width: '100%', height: 180, overflow: 'hidden', borderTopLeftRadius: 8, borderTopRightRadius: 8 }}>
+                        <img src={imgSrc} alt={auction.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      </Box>
                       <CardContent>
-                        <Typography gutterBottom variant="h5" component="div">
-                          {truncate(auction.title, 40)}
+                        <Stack direction="row" alignItems="center" spacing={1} mb={1}>
+                          <Chip label={auction.status} color={getStatusColor(auction.status)} size="small" />
+                        </Stack>
+                        <Typography variant="h6" gutterBottom noWrap>
+                          {auction.title}
                         </Typography>
                         <Typography variant="body2" color="text.secondary" gutterBottom>
-                          {truncate(auction.description, 80)}
+                          Current Price:
                         </Typography>
-                        <Typography variant="h6" color="primary" gutterBottom>
+                        <Typography variant="h5" color="primary" gutterBottom>
                           {auction.currentPrice.toLocaleString()} VND
                         </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          End Time: {auction.endTime && !isNaN(parseDate(auction.endTime)) ? format(parseDate(auction.endTime), 'PPpp') : 'N/A'}
+                        <Typography variant="body2" color="text.secondary" gutterBottom noWrap>
+                          {auction.description}
                         </Typography>
-                        <Box sx={{ mt: 1 }}>
-                          <Chip label={auction.status} color={getStatusColor(auction.status)} size="small" />
-                        </Box>
+                        <Typography variant="body2" color="text.secondary" gutterBottom>
+                          Start Time: {formatDate(auction.startTime)}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" gutterBottom>
+                          End Time: {formatDate(auction.endTime)}
+                        </Typography>
+                        <Stack direction="row" spacing={2} mt={1}>
+                          <Typography variant="caption" color="text.secondary">
+                            👁️ {auction.viewCount || 0} views
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            🏷️ {auction.bids ? auction.bids.length : 0} bids
+                          </Typography>
+                        </Stack>
+                        <Typography variant="caption" color="text.secondary" display="block" mt={1}>
+                          Seller: {auction.seller?.username || 'N/A'}
+                        </Typography>
                       </CardContent>
-                      <CardActions>
-                        <Button size="small" onClick={() => navigate(`/auctions/${auction.id}`)}>
+                      <CardActions sx={{ mt: 'auto' }}>
+                        <Button variant="outlined" size="small" onClick={() => navigate(`/auctions/${auction.id}`)}>
                           View Details
                         </Button>
                       </CardActions>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Payment Information</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .header {
+        text-align: center;
+        padding: 20px 0;
+        border-bottom: 2px solid #eee;
+      }
+      .content {
+        padding: 20px 0;
+      }
+      .details {
+        background: #f9f9f9;
+        padding: 15px;
+        border-radius: 5px;
+        margin: 20px 0;
+      }
+      .details table {
+        width: 100%;
+      }
+      .details td {
+        padding: 8px;
+      }
+      .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        margin: 10px;
+      }
+      .btn-vnpay {
+        background-color: #1a73e8;
+      }
+      .footer {
+        text-align: center;
+        padding-top: 20px;
+        border-top: 1px solid #eee;
+        font-size: 0.9em;
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>Payment Information</h1>
+    </div>
+    <div class="content">
+      <p>Dear <span th:text="${userName}">User</span>,</p>
+      <p>Thank you for your order. Here are your payment details:</p>
+
+      <div class="details">
+        <table>
+          <tr>
+            <td><strong>Order Code:</strong></td>
+            <td th:text="${orderCode}">ORD123456</td>
+          </tr>
+          <tr>
+            <td><strong>Amount:</strong></td>
+            <td th:text="${#numbers.formatDecimal(amount, 0, 'COMMA', 0, 'POINT')} + ' VND'">1,000,000 VND</td>
+          </tr>
+          <tr>
+            <td><strong>Due Date:</strong></td>
+            <td th:text="${dueDate}">01/01/2024 12:00</td>
+          </tr>
+        </table>
+      </div>
+
+      <div style="text-align: center; margin: 30px 0">
+        <p>Please click the button below to proceed with your payment:</p>
+        <a class="btn btn-vnpay" th:href="${paymentUrl}">Pay with VNPay</a>
+      </div>
+
+      <p>After completing the payment, you will receive a confirmation email.</p>
+
+      <div style="text-align: center; margin-top: 20px">
+        <a class="btn" th:href="${transactionUrl}">View Order Details</a>
+      </div>
+    </div>
+    <div class="footer">
+      <p>This is an automated email, please do not reply.</p>
+      <p>© 2024 Online Auction Platform. All rights reserved.</p>
+    </div>
+  </body>
+</html>

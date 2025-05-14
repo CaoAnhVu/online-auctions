@@ -13,7 +13,6 @@ import {
   Alert,
   Card,
   CardMedia,
-  CardContent,
   Divider,
   List,
   ListItem,
@@ -57,7 +56,6 @@ function AuctionDetailPage() {
   const [bidAmount, setBidAmount] = useState('');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [lastBidId, setLastBidId] = useState(null);
-  const [lastBidUser, setLastBidUser] = useState(null);
 
   console.log('AuctionDetailPage render', currentAuction);
 

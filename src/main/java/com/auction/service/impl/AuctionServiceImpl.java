@@ -2,11 +2,15 @@ package com.auction.service.impl;
 
 import com.auction.model.Auction;
 import com.auction.model.AuctionStatus;
+import com.auction.model.Bid;
 import com.auction.repository.AuctionRepository;
+import com.auction.repository.BidRepository;
 import com.auction.service.AuctionService;
 import com.auction.service.AuctionStatusHistoryService;
+import com.auction.service.AuctionWinnerService;
 import com.auction.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -18,11 +22,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class AuctionServiceImpl implements AuctionService {
     private final AuctionRepository auctionRepository;
     private final UserService userService;
     private final AuctionStatusHistoryService auctionStatusHistoryService;
+    private final BidRepository bidRepository;
+    private final AuctionWinnerService auctionWinnerService;
 
     @Override
     @Transactional
@@ -159,13 +166,35 @@ public class AuctionServiceImpl implements AuctionService {
     }
 
     @Override
-    public void startAuction(Long id) {
-        throw new UnsupportedOperationException("Method not implemented");
-    }
+    @Transactional
+    public void endAuction(Long auctionId) {
+        Auction auction = auctionRepository.findById(auctionId)
+                .orElseThrow(() -> new RuntimeException("Auction not found with id: " + auctionId));
 
-    @Override
-    public void endAuction(Long id) {
-        throw new UnsupportedOperationException("Method not implemented");
+        if (auction.getStatus() != AuctionStatus.ACTIVE) {
+            throw new RuntimeException("Auction is not active");
+        }
+
+        // Get the highest bid
+        Bid winningBid = bidRepository.findTopByAuctionOrderByAmountDesc(auction)
+                .orElse(null);
+
+        // Update auction status
+        auction.setStatus(AuctionStatus.ENDED);
+        auction.setEndTime(LocalDateTime.now());
+        
+        if (winningBid != null) {
+            auction.setWinningBid(winningBid);
+            auctionRepository.save(auction);
+            
+            // Process winner and send notification
+            auctionWinnerService.processAuctionWinner(auction, winningBid);
+            
+            log.info("Auction {} ended with winning bid: {}", auctionId, winningBid.getAmount());
+        } else {
+            auctionRepository.save(auction);
+            log.info("Auction {} ended with no bids", auctionId);
+        }
     }
 
     @Override
@@ -232,5 +261,19 @@ public class AuctionServiceImpl implements AuctionService {
     @Scheduled(fixedRate = 60000) // Chạy mỗi 60 giây
     public void scheduledStartPendingAuctions() {
         startPendingAuctions();
+    }
+
+    @Override
+    @Transactional
+    public void startAuction(Long id) {
+        Auction auction = getAuctionById(id);
+        if (auction.getStatus() != AuctionStatus.PENDING) {
+            throw new RuntimeException("Auction must be in PENDING status to start");
+        }
+        auction.setStatus(AuctionStatus.ACTIVE);
+        auction.setStartTime(LocalDateTime.now());
+        auctionRepository.save(auction);
+        auctionStatusHistoryService.logStatusChange(auction, AuctionStatus.PENDING, AuctionStatus.ACTIVE, "system");
+        log.info("Started auction: {}", id);
     }
 }

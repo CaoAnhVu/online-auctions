@@ -33,30 +33,34 @@ public class Auction {
     @Column(name = "starting_price", nullable = false)
     private BigDecimal startingPrice;
 
-    @Column(name = "current_price")
+    @Column(name = "current_price", nullable = false)
     private BigDecimal currentPrice;
 
-    @Column(name = "minimum_bid_increment")
+    @Column(name = "minimum_bid_increment", nullable = false)
     private BigDecimal minimumBidIncrement;
 
-    @Column(name = "start_time")
+    @Column(name = "start_time", nullable = false)
     private LocalDateTime startTime;
 
-    @Column(name = "end_time")
+    @Column(name = "end_time", nullable = false)
     private LocalDateTime endTime;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "winning_bid_id")
+    private Bid winningBid;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private AuctionStatus status = AuctionStatus.DRAFT;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "item_condition")
+    @Column(name = "item_condition", nullable = false)
     private ItemCondition condition;
 
     @Column
     private String category;
 
-    @Column(name = "view_count")
+    @Column(name = "view_count", nullable = false)
     private Integer viewCount = 0;
 
     @Column(name = "featured")

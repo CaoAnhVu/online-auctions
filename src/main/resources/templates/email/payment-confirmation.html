@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Xác nhận thanh toán</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .header {
+        background-color: #4caf50;
+        color: white;
+        padding: 20px;
+        text-align: center;
+        border-radius: 5px;
+      }
+      .content {
+        padding: 20px;
+        background-color: #f9f9f9;
+        border-radius: 5px;
+        margin-top: 20px;
+      }
+      .status {
+        text-align: center;
+        margin: 20px 0;
+        padding: 10px;
+        border-radius: 5px;
+      }
+      .status.success {
+        background-color: #dff0d8;
+        color: #3c763d;
+      }
+      .status.failed {
+        background-color: #f2dede;
+        color: #a94442;
+      }
+      .footer {
+        margin-top: 20px;
+        text-align: center;
+        font-size: 12px;
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>Xác nhận thanh toán đấu giá</h1>
+    </div>
+
+    <div class="content">
+      <p>Xin chào <span th:text="${buyerName}">Người mua</span>,</p>
+
+      <div th:class="${status.name() == 'COMPLETED'} ? 'status success' : 'status failed'">
+        <h2 th:if="${status.name() == 'COMPLETED'}">Thanh toán thành công!</h2>
+        <h2 th:if="${status.name() == 'FAILED'}">Thanh toán thất bại!</h2>
+      </div>
+
+      <p><strong>Chi tiết giao dịch:</strong></p>
+      <ul>
+        <li>Mã đơn hàng: <span th:text="${orderId}">ORDER123</span></li>
+        <li>Số tiền: <span th:text="${#numbers.formatDecimal(amount, 0, 'COMMA', 0, 'POINT')}">1,000,000</span> VNĐ</li>
+        <li>
+          Trạng thái:
+          <span th:if="${status.name() == 'COMPLETED'}" style="color: #3c763d">Thành công</span>
+          <span th:if="${status.name() == 'FAILED'}" style="color: #a94442">Thất bại</span>
+        </li>
+      </ul>
+
+      <div th:if="${status.name() == 'COMPLETED'}">
+        <p>Cảm ơn bạn đã thanh toán. Người bán sẽ sớm liên hệ với bạn để thực hiện giao hàng.</p>
+      </div>
+
+      <div th:if="${status.name() == 'FAILED'}">
+        <p>Rất tiếc giao dịch không thành công. Vui lòng thử lại hoặc liên hệ với chúng tôi nếu cần hỗ trợ.</p>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>Email này được gửi tự động, vui lòng không trả lời.</p>
+      <p>© 2024 Online Auction Platform. All rights reserved.</p>
+    </div>
+  </body>
+</html>

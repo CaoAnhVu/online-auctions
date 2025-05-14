@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Payment Information</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .header {
+        text-align: center;
+        padding: 20px 0;
+        border-bottom: 2px solid #eee;
+      }
+      .content {
+        padding: 20px 0;
+      }
+      .details {
+        background: #f9f9f9;
+        padding: 15px;
+        border-radius: 5px;
+        margin: 20px 0;
+      }
+      .details table {
+        width: 100%;
+      }
+      .details td {
+        padding: 8px;
+      }
+      .qr-container {
+        text-align: center;
+        margin: 30px 0;
+      }
+      .qr-code {
+        max-width: 300px;
+        height: auto;
+      }
+      .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+      }
+      .footer {
+        text-align: center;
+        padding-top: 20px;
+        border-top: 1px solid #eee;
+        font-size: 0.9em;
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>Payment Information</h1>
+    </div>
+    <div class="content">
+      <p>Dear <span th:text="${userName}">User</span>,</p>
+      <p>Thank you for participating in the auction: <strong th:text="${auctionTitle}">Item Title</strong></p>
+      <p>Please complete your payment using the information below:</p>
+
+      <div class="details">
+        <table>
+          <tr>
+            <td><strong>Amount:</strong></td>
+            <td th:text="${#numbers.formatDecimal(amount, 0, 'COMMA', 0, 'POINT')} + ' VND'">10,000,000 VND</td>
+          </tr>
+          <tr>
+            <td><strong>Transaction ID:</strong></td>
+            <td th:text="${transactionId}">TRX12345</td>
+          </tr>
+          <tr>
+            <td><strong>Bank Information:</strong></td>
+            <td th:text="${bankInfo}">Bank - Account Number</td>
+          </tr>
+          <tr>
+            <td><strong>Due Date:</strong></td>
+            <td th:text="${dueDate}">01/01/2024 12:00</td>
+          </tr>
+        </table>
+      </div>
+
+      <p>Scan the QR code below for quick payment:</p>
+
+      <div class="qr-container">
+        <img class="qr-code" src="cid:qrCode" alt="Payment QR Code" />
+      </div>
+
+      <p>After payment, you will receive a confirmation and further instructions about receiving the item.</p>
+
+      <p>If you have any questions, please visit the payment page or contact our support team.</p>
+
+      <div style="text-align: center; margin-top: 20px">
+        <a class="btn" th:href="@{${transactionUrl}}">View Transaction Details</a>
+      </div>
+    </div>
+    <div class="footer">
+      <p>This is an automated email, please do not reply.</p>
+      <p>© 2024 Online Auction Platform. All rights reserved.</p>
+    </div>
+  </body>
+</html>

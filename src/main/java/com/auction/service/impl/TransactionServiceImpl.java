@@ -5,7 +5,7 @@ import com.auction.model.User;
 import com.auction.enums.PaymentStatus;
 import com.auction.repository.TransactionRepository;
 import com.auction.service.TransactionService;
-import com.auction.utils.QRCodeGenerator;
+import com.auction.payment.util.QrCodeGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.nio.charset.StandardCharsets;
 
 @Service
 @Slf4j
@@ -21,7 +22,7 @@ import java.util.Optional;
 @Transactional
 public class TransactionServiceImpl implements TransactionService {
     private final TransactionRepository transactionRepository;
-    private final QRCodeGenerator qrCodeGenerator;
+    private final QrCodeGenerator qrCodeGenerator;
 
     @Override
     public Transaction createTransaction(Long auctionId, User buyer, String bankInfo) {
@@ -83,10 +84,11 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public byte[] generateQRCode(Transaction transaction) {
-        log.info("Generating QR code for transaction: {}", transaction.getId());
-        String qrContent = String.format("Transaction ID: %d\nAmount: %d\nBank Info: %s",
-                transaction.getId(), transaction.getAmount(), transaction.getBankInfo());
-        return qrCodeGenerator.generateQRCode(qrContent);
+        String content = String.format("TXN:%s|AMT:%s|REF:%s", 
+            transaction.getId(),
+            transaction.getAmount(),
+            transaction.getTransactionRef());
+        return qrCodeGenerator.generateQrCodeBase64(content).getBytes(StandardCharsets.UTF_8);
     }
 
     @Override
